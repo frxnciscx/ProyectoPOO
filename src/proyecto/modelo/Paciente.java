@@ -24,8 +24,8 @@ public class Paciente {
         if (nombre == null || nombre.trim().isEmpty()) {
             throw new IllegalArgumentException("El nombre no puede ser nulo o vacio");
         }
-        if (edad < 0 || edad > 150) {
-            throw new IllegalArgumentException("La edad debe ser entre 0 y 150");
+        if (edad < 1 || edad > 99) {
+            throw new IllegalArgumentException("La edad debe ser entre 1 y 99");
         }
         if (clave == null || clave.length() < 4) {
             throw new IllegalArgumentException("La clave debe tener al menos 4 caracteres");
@@ -120,47 +120,44 @@ public class Paciente {
         LocalDateTime ahora = LocalDateTime.now();
         for (Recordatorio r : listaRecordatorios) {
             if (r.esHoraDeTomar()) {
-                activos.add("Activo: " + r.obtenerTexto());
+                //CORRECCION: se llama a metodo renombrado formatearInformacion()
+                activos.add("Activo: " + r.formatearInformacion());
             }
         }
         return activos;
     }
 
-    public String obtenerTextoMedicamentos() {
+    //CORRECCION: se renombran metodos por buenas practicas
+    public String generarReporteMedicamentos() {
         if (listaMedicamentos.isEmpty()) {
             return "No hay medicamentos registrados";
         }
         StringBuilder sb = new StringBuilder("Medicamentos:\n");
         for (Medicamento m : listaMedicamentos) {
-            sb.append("- ").append(m.getNombre()).append(" (Dosis: ").append(m.getDosis())
-                    .append(", Stock: ").append(m.getCantidad()).append(", Vence: ").append(m.getFechaVencimiento())
-                    .append(" - ").append(m.estaVencido() ? "VENCIDO" : "Valido").append(")\n");
-            if (m instanceof Insulina) {
-                Insulina ins = (Insulina) m;
-                sb.append("  Glucosa minima: ").append(ins.getGlucosaMinima()).append(" mg/dL\n");
-            }
+            //CORRECCION: se llama a metodo renombrado
+            sb.append("- ").append(m.formatearInformacion()).append("\n");
         }
         return sb.toString();
     }
 
-    public String obtenerTextoRecordatorios() {
+    public String generarReporteRecordatorios() {
         if (listaRecordatorios.isEmpty()) {
             return "No hay recordatorios configurados";
         }
         StringBuilder sb = new StringBuilder("Recordatorios:\n");
         for (Recordatorio r : listaRecordatorios) {
-            sb.append(r.obtenerTexto()).append("\n");
+            sb.append(r.formatearInformacion()).append("\n");
         }
         return sb.toString();
     }
 
-    public String obtenerTextoHistorial() {
-        return historial.obtenerTexto();
+    public String generarReporteHistorial() {
+        return historial.formatearHistorial();
     }
 
+    //GETTERS Y SETTERS
     public String getRut() { return rut; }
     public void setRut(String rut) { this.rut = rut; }
-
     public String getNombre() { return nombre; }
     public void setNombre(String nombre) {
         if (nombre == null || nombre.trim().isEmpty()) {
@@ -168,15 +165,13 @@ public class Paciente {
         }
         this.nombre = nombre.trim();
     }
-
     public int getEdad() { return edad; }
     public void setEdad(int edad) {
         if (edad < 0 || edad > 150) {
-            throw new IllegalArgumentException("La edad debe ser entre 0 y 150");
+            throw new IllegalArgumentException("La edad debe ser entre 1 y 99");
         }
         this.edad = edad;
     }
-
     public String getClave() { return clave; }
     public void setClave(String clave) {
         if (clave == null || clave.length() < 4) {
@@ -184,15 +179,12 @@ public class Paciente {
         }
         this.clave = clave;
     }
-
     public List<Medicamento> getListaMedicamentos() {
         return new ArrayList<>(listaMedicamentos);
     }
-
     public List<Recordatorio> getListaRecordatorios() {
         return new ArrayList<>(listaRecordatorios);
     }
-
     public HistorialMedico getHistorial() { return historial; }
 
     public void cargarMedicamento(Medicamento m) {
