@@ -103,7 +103,7 @@ public class RepositorioPaciente {
         return pacientes.stream().anyMatch(p -> p.getRut().equalsIgnoreCase(rut.trim()));
     }
 
-    public Optional<Paciente> obtenerPaciente(String rut) {
+    public Optional<Paciente> buscarPaciente(String rut) {
         if (rut == null || rut.trim().isEmpty()) {
             return Optional.empty();
         }
@@ -117,7 +117,7 @@ public class RepositorioPaciente {
             if (p == null) {
                 return "ERROR: Paciente no puede ser nulo";
             }
-            Optional<Paciente> optExistente = obtenerPaciente(p.getRut());
+            Optional<Paciente> optExistente = buscarPaciente(p.getRut());
             if (optExistente.isPresent()) {
                 Paciente existente = optExistente.get();
                 existente.setNombre(p.getNombre());
