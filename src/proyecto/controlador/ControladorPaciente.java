@@ -1,15 +1,15 @@
 package proyecto.controlador;
 
 import proyecto.modelo.Paciente;
-import proyecto.modelo.PacientesCSV;
+import proyecto.modelo.RepositorioPaciente;
 import proyecto.modelo.GestorDatosPaciente;
 import java.util.Optional;
 
 public class ControladorPaciente {
-    private final PacientesCSV pacientesCSV;
+    private final RepositorioPaciente repositorioPaciente;
 
     public ControladorPaciente() {
-        this.pacientesCSV = new PacientesCSV();
+        this.repositorioPaciente = new RepositorioPaciente();
     }
 
     public String registrarPaciente(String rut, String nombre, int edad, String clave) {
@@ -26,7 +26,7 @@ public class ControladorPaciente {
             return "ERROR: La edad debe ser entre 0 y 150";
         }
 
-        return pacientesCSV.registrarPaciente(rut.trim(), nombre.trim(), edad, clave);
+        return repositorioPaciente.registrarPaciente(rut.trim(), nombre.trim(), edad, clave);
     }
 
     public Optional<Paciente> loginPaciente(String rut, String clave) {
@@ -34,7 +34,7 @@ public class ControladorPaciente {
             return Optional.empty();
         }
 
-        Optional<Paciente> optPaciente = pacientesCSV.obtenerPaciente(rut.trim());
+        Optional<Paciente> optPaciente = repositorioPaciente.obtenerPaciente(rut.trim());
         if (optPaciente.isPresent()) {
             Paciente p = optPaciente.get();
             if (p.getClave().equals(clave.trim())) {
@@ -60,6 +60,6 @@ public class ControladorPaciente {
     }
 
     public String listarPacientes() {
-        return "Pacientes registrados: " + pacientesCSV.listarPacientes().size();
+        return "Pacientes registrados: " + repositorioPaciente.listarPacientes().size();
     }
 }

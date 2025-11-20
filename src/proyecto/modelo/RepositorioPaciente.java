@@ -6,7 +6,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-public class PacientesCSV {
+public class RepositorioPaciente {
 
     private final String rutaArchivo = "pacientes.csv";
     private List<Paciente> pacientes;
@@ -17,7 +17,7 @@ public class PacientesCSV {
         }
     }
 
-    public PacientesCSV() {
+    public RepositorioPaciente() {
         this.pacientes = new ArrayList<>();
         try {
             cargarPacientes();
