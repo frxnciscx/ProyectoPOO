@@ -6,11 +6,11 @@ import proyecto.modelo.Recordatorio;
 import proyecto.modelo.GestorDatosPaciente;
 import java.util.List;
 
-public class ControladorMedicamentos {
+public class ControladorMedicamento {
     private final Paciente paciente;
     private final GestorDatosPaciente gestorDatos;
 
-    public ControladorMedicamentos(Paciente paciente) {
+    public ControladorMedicamento(Paciente paciente) {
         if (paciente == null) {
             throw new IllegalArgumentException("El paciente no puede ser nulo");
         }

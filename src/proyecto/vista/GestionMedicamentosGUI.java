@@ -1,6 +1,6 @@
 package proyecto.vista;
 
-import proyecto.controlador.ControladorMedicamentos;
+import proyecto.controlador.ControladorMedicamento;
 import proyecto.modelo.Medicamento;
 import proyecto.modelo.Insulina;
 import proyecto.modelo.Paciente;
@@ -8,26 +8,23 @@ import proyecto.modelo.Recordatorio;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import proyecto.vista.PantallaInicio;
 
 public class GestionMedicamentosGUI extends JFrame {
 
     private final Paciente paciente;
-    private final ControladorMedicamentos controladorMed;
+    private final ControladorMedicamento controladorMed;
     private JComboBox<String> comboMedicamentos;
     private JTextArea medicamentosArea;
     private JTextArea historialArea;
     private JTextArea recordatoriosArea;
     private RecordatorioTimer recordatorioTimer;
 
-    public GestionMedicamentosGUI(ControladorMedicamentos controladorMed, Paciente paciente) {
+    public GestionMedicamentosGUI(ControladorMedicamento controladorMed, Paciente paciente) {
         this.controladorMed = controladorMed;
         this.paciente = paciente;
         setTitle("Gestion de Medicamentos - " + paciente.getNombre());
@@ -322,7 +319,7 @@ public class GestionMedicamentosGUI extends JFrame {
         actualizarRecordatoriosArea();
     }
 
-    public ControladorMedicamentos getControladorMed() {
+    public ControladorMedicamento getControladorMed() {
         return controladorMed;
     }
 

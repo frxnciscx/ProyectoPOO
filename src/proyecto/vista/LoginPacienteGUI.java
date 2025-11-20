@@ -1,7 +1,7 @@
 package proyecto.vista;
 
 import proyecto.controlador.ControladorPaciente;
-import proyecto.controlador.ControladorMedicamentos;
+import proyecto.controlador.ControladorMedicamento;
 import proyecto.modelo.Paciente;
 
 import javax.swing.*;
@@ -107,7 +107,7 @@ public class LoginPacienteGUI extends JFrame {
 
         if (optPaciente.isPresent()) {
             JOptionPane.showMessageDialog(this, msgLogin, "Exito", JOptionPane.INFORMATION_MESSAGE);
-            ControladorMedicamentos ctrlMed = new ControladorMedicamentos(optPaciente.get());
+            ControladorMedicamento ctrlMed = new ControladorMedicamento(optPaciente.get());
             GestionMedicamentosGUI gestion = new GestionMedicamentosGUI(ctrlMed, optPaciente.get());
             gestion.setVisible(true);
             dispose();
