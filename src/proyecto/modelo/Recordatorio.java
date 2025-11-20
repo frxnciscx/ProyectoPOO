@@ -45,7 +45,8 @@ public class Recordatorio {
         this.ultimaToma = LocalDateTime.now();
     }
 
-    public String obtenerTexto() {
+    //CORRECCION: nombre descriptivo
+    public String formatearInformacion() {
         StringBuilder sb = new StringBuilder();
         sb.append("Recordatorio para ").append(medicamentoAsociado.getNombre())
                 .append(" a las ").append(hora.format(DateTimeFormatter.ofPattern("HH:mm")))
@@ -56,18 +57,16 @@ public class Recordatorio {
         return sb.toString();
     }
 
+    //GETTERS
     public LocalTime getHora() {
         return hora;
     }
-
     public int getFrecuenciaHoras() {
         return frecuenciaHoras;
     }
-
     public Medicamento getMedicamentoAsociado() {
         return medicamentoAsociado;
     }
-
     public LocalDateTime getUltimaToma() {
         return ultimaToma;
     }
