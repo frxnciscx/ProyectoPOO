@@ -22,10 +22,9 @@ public class ControladorPaciente {
         if (clave == null || clave.trim().isEmpty()) {
             return "ERROR: La clave no puede ser nula o vacia";
         }
-        if (edad < 0 || edad > 150) {
-            return "ERROR: La edad debe ser entre 0 y 150";
+        if (edad < 1 || edad > 99) {
+            return "ERROR: La edad debe ser entre 1 y 99";
         }
-
         return repositorioPaciente.registrarPaciente(rut.trim(), nombre.trim(), edad, clave);
     }
 
@@ -33,8 +32,8 @@ public class ControladorPaciente {
         if (rut == null || rut.trim().isEmpty() || clave == null || clave.trim().isEmpty()) {
             return Optional.empty();
         }
-
-        Optional<Paciente> optPaciente = repositorioPaciente.obtenerPaciente(rut.trim());
+        //CORRECCION: metodo renombrado a buscarPaciente (antes obtenerPaciente)
+        Optional<Paciente> optPaciente = repositorioPaciente.buscarPaciente(rut.trim());
         if (optPaciente.isPresent()) {
             Paciente p = optPaciente.get();
             if (p.getClave().equals(clave.trim())) {
