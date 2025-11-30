@@ -124,23 +124,21 @@ public class GestionMedicamentosGUI extends JFrame {
     private void cargarComboMedicamentos() {
         comboMedicamentos.removeAllItems();
         Object seleccionado = comboMedicamentos.getSelectedItem();
-        //CORRECCION: se llama a generarReporteMedicamentos (antes obtenerTextoMedicamentos)
-        String textoMeds = controladorMed.generarReporteMedicamentos();
-        if (textoMeds.equals("No hay medicamentos registrados")) {
+        //MEJORA: usar el metodo para que devuelta la lista directa, sin procesar texto
+        List<String> nombres = controladorMed.listarNombresMedicamentos();
+        if (nombres.isEmpty()) {
             comboMedicamentos.setEnabled(false);
             return;
         }
         comboMedicamentos.setEnabled(true);
-        for (String linea : textoMeds.split("\n")) {
-            if (linea.contains("- ") && linea.contains("(")) {
-                String nombre = linea.substring(2, linea.indexOf(" (")).trim();
-                if (!nombre.isEmpty()) {
-                    comboMedicamentos.addItem(nombre);
-                }
-            }
+        for (String nombre : nombres ) {
+            comboMedicamentos.addItem(nombre);
         }
         if (seleccionado != null) {
-            comboMedicamentos.setSelectedItem(seleccionado);
+            //se verifica si el medicamento seleccionado aun existe en la nueva lista
+            if (nombres.contains(seleccionado)) {
+                comboMedicamentos.setSelectedItem(seleccionado);
+            }
         }
     }
 
