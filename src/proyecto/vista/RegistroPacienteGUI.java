@@ -1,18 +1,15 @@
 package proyecto.vista;
 
 import proyecto.controlador.ControladorPaciente;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 
 public class RegistroPacienteGUI extends JFrame {
-
     private JTextField txtRut;
     private JTextField txtNombre;
     private JTextField txtEdad;
-    private JPasswordField txtClave;
     private JButton btnRegistrar;
     private final ControladorPaciente controlador;
 
@@ -20,7 +17,7 @@ public class RegistroPacienteGUI extends JFrame {
         this.controlador = controlador;
 
         setTitle("Registro de paciente");
-        setSize(450, 400); // Tamaño ajustado
+        setSize(450, 350); // Tamaño ajustado
         setLocationRelativeTo(null);
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         addWindowListener(new WindowAdapter() {
@@ -79,16 +76,6 @@ public class RegistroPacienteGUI extends JFrame {
         gbc.gridy = 3;
         panel.add(txtEdad, gbc);
 
-        JLabel lblClave = new JLabel("Clave:");
-        gbc.gridx = 0;
-        gbc.gridy = 4;
-        panel.add(lblClave, gbc);
-
-        txtClave = new JPasswordField(20);
-        gbc.gridx = 1;
-        gbc.gridy = 4;
-        panel.add(txtClave, gbc);
-
         btnRegistrar = new JButton("Registrar");
         gbc.gridx = 0;
         gbc.gridy = 5;
@@ -117,10 +104,9 @@ public class RegistroPacienteGUI extends JFrame {
     private void registrarPaciente() {
         String rut = txtRut.getText().trim();
         String nombre = txtNombre.getText().trim();
-        String clave = new String(txtClave.getPassword()).trim();
         String edadStr = txtEdad.getText().trim();
 
-        if (rut.isEmpty() || nombre.isEmpty() || clave.isEmpty() || edadStr.isEmpty()) {
+        if (rut.isEmpty() || nombre.isEmpty() || edadStr.isEmpty()) {
             JOptionPane.showMessageDialog(this, "Todos los campos son obligatorios", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
@@ -133,7 +119,7 @@ public class RegistroPacienteGUI extends JFrame {
             return;
         }
 
-        String msg = controlador.registrarPaciente(rut, nombre, edad, clave);
+        String msg = controlador.registrarPaciente(rut, nombre, edad);
 
         if (msg.startsWith("EXITO")) {
             JOptionPane.showMessageDialog(this, msg, "Exito", JOptionPane.INFORMATION_MESSAGE);
@@ -150,6 +136,5 @@ public class RegistroPacienteGUI extends JFrame {
         txtRut.setText("");
         txtNombre.setText("");
         txtEdad.setText("");
-        txtClave.setText("");
     }
 }
