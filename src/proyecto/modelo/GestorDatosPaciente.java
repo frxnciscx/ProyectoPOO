@@ -3,22 +3,40 @@ package proyecto.modelo;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
-
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 public class GestorDatosPaciente {
-
     private final Paciente paciente;
     private final String rutPaciente;
     private final String ARCHIVO_JSON;
     private final Gson gson;
 
     private static class PacienteData {
-        List<String> medicamentosCSV;
-        List<String> recordatoriosCSV;
-        List<String> historialLineas;
+        List<MedicamentoJSON> medicamentos;
+        List<RecordatorioJSON> recordatorios;
+        List<String> historial;
+    }
+
+    private static class MedicamentoJSON {
+        String tipo; //medicamento o insulina
+        String nombre;
+        int dosis;
+        int cantidad;
+        String fechaVencimiento;
+        double glucosaMinima;
+    }
+
+    private static class RecordatorioJSON {
+        String hora;
+        int frecuencia;
+        String nombreMedicamento;
     }
 
     public GestorDatosPaciente(Paciente paciente) {
@@ -27,30 +45,49 @@ public class GestorDatosPaciente {
         }
         this.paciente = paciente;
         this.rutPaciente = paciente.getRut().replaceAll("[^a-zA-Z0-9.-]", "_");
-
         this.ARCHIVO_JSON = rutPaciente + ".json";
-
         this.gson = new GsonBuilder().setPrettyPrinting().create();
     }
 
     public void guardarDatos() {
         PacienteData data = new PacienteData();
+        data.medicamentos = new ArrayList<>();
+        data.recordatorios = new ArrayList<>();
+        data.historial = paciente.getHistorial().getRegistros();
 
-        data.medicamentosCSV = new ArrayList<>();
         for (Medicamento med : paciente.getListaMedicamentos()) {
+            MedicamentoJSON objJson = new MedicamentoJSON();
+            objJson.nombre = med.getNombre();
+            objJson.dosis = med.getDosis();
+            objJson.cantidad = med.getCantidad();
+            objJson.fechaVencimiento = med.getFechaVencimiento();
+
             if (med instanceof Insulina) {
-                data.medicamentosCSV.add("Insulina;" + med.toCSV());
+                objJson.tipo = "Insulina";
+                objJson.glucosaMinima = ((Insulina) med).getGlucosaMinima();
             } else {
-                data.medicamentosCSV.add("Medicamento;" + med.toCSV());
+                objJson.tipo = "Medicamento";
+            }
+            data.medicamentos.add(objJson);
+        }
+
+        for (Recordatorio rec : paciente.getListaRecordatorios()) {
+            RecordatorioJSON objJson = new RecordatorioJSON();
+            objJson.hora = rec.getHora().format(DateTimeFormatter.ofPattern("HH:mm"));
+            objJson.frecuencia = rec.getFrecuenciaHoras();
+            objJson.nombreMedicamento = rec.getMedicamentoAsociado().getNombre();
+            data.recordatorios.add(objJson);
+        }
+
+        File archivoActual = new File(ARCHIVO_JSON);
+        if (archivoActual.exists()) {
+            try {
+                File backup = new File(rutPaciente + "_backup.json");
+                Files.copy(archivoActual.toPath(), backup.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            } catch (IOException e) {
+                System.err.println("No se pudo crear backup de datos para " + rutPaciente);
             }
         }
-
-        data.recordatoriosCSV = new ArrayList<>();
-        for (Recordatorio rec : paciente.getListaRecordatorios()) {
-            data.recordatoriosCSV.add(rec.toCSV());
-        }
-
-        data.historialLineas = paciente.getHistorial().getRegistros();
 
         try (Writer writer = new BufferedWriter(new FileWriter(ARCHIVO_JSON))) {
             gson.toJson(data, writer);
@@ -66,54 +103,56 @@ public class GestorDatosPaciente {
         }
 
         try (Reader reader = new BufferedReader(new FileReader(f))) {
-
             PacienteData data = gson.fromJson(reader, PacienteData.class);
             if (data == null) {
                 return;
             }
-
             paciente.limpiarDatosCargados();
 
-            if (data.medicamentosCSV != null) {
-                for (String linea : data.medicamentosCSV) {
+            if (data.medicamentos != null) {
+                for (MedicamentoJSON json : data.medicamentos) {
                     try {
-                        String[] parte = linea.split(";", 2);
-                        if (parte.length < 2) continue;
-                        String tipo = parte[0];
-                        String csvData = parte[1];
-
                         Medicamento med;
-                        if ("Insulina".equals(tipo)) {
-                            med = Insulina.fromCSV(csvData);
+                        if ("Insulina".equals(json.tipo)) {
+                            med = new Insulina(json.nombre, json.dosis, json.cantidad, json.fechaVencimiento, json.glucosaMinima);
                         } else {
-                            med = Medicamento.fromCSV(csvData);
+                            med = new Medicamento(json.nombre, json.dosis, json.cantidad, json.fechaVencimiento);
                         }
                         paciente.cargarMedicamento(med);
                     } catch (Exception e) {
-                        System.err.println("Error al cargar linea de medicamento: " + linea + " (" + e.getMessage() + ")");
+                        System.err.println("Error al recuperar medicamento " + json.nombre + ": " + e.getMessage());
                     }
                 }
             }
 
-            if (data.recordatoriosCSV != null) {
-                for (String linea : data.recordatoriosCSV) {
+            if (data.recordatorios != null) {
+                for (RecordatorioJSON json : data.recordatorios) {
                     try {
-                        Recordatorio rec = Recordatorio.fromCSV(linea, paciente.getListaMedicamentos());
-                        paciente.cargarRecordatorio(rec);
+                        Optional<Medicamento> medAsociado = paciente.getListaMedicamentos().stream()
+                                .filter(m -> m.getNombre().equalsIgnoreCase(json.nombreMedicamento))
+                                .findFirst();
+
+                        if (medAsociado.isPresent()) {
+                            LocalTime hora = LocalTime.parse(json.hora, DateTimeFormatter.ofPattern("HH:mm"));
+                            Recordatorio rec = new Recordatorio(hora, json.frecuencia, medAsociado.get());
+                            paciente.cargarRecordatorio(rec);
+                        } else {
+                            System.err.println("Se omitio un recordatorio porque el medicamento" + json.nombreMedicamento + "no existe");
+                        }
                     } catch (Exception e) {
-                        System.err.println("Error al cargar linea de recordatorio: " + linea + " (" + e.getMessage() + ")");
+                        System.err.println("Error al recuperar recordatorio: " + e.getMessage());
                     }
                 }
             }
 
-            if (data.historialLineas != null) {
-                for (String linea : data.historialLineas) {
+            if (data.historial != null) {
+                for (String linea : data.historial) {
                     paciente.getHistorial().agregarRegistroDirecto(linea);
                 }
             }
 
         } catch (IOException | JsonSyntaxException e) {
-            System.err.println("Error al cargar o parsear " + ARCHIVO_JSON + ": " + e.getMessage());
+            System.err.println("Error al cargar " + ARCHIVO_JSON + ": " + e.getMessage());
         }
     }
 }
