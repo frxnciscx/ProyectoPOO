@@ -1,154 +1,107 @@
 package proyecto.modelo;
 
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 import java.io.*;
+import java.lang.reflect.Type;
+import java.nio.file.Files;
+import java.nio.file.StandardCopyOption;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 public class RepositorioPaciente {
-
-    private final String rutaArchivo = "pacientes.csv";
+    private final String RUTA_ARCHIVO = "pacientes.json";
+    private final String RUTA_BACKUP = "pacientes_backup.json";
     private List<Paciente> pacientes;
-
-    public static class PersistenciaException extends Exception {
-        public PersistenciaException(String message, Throwable cause) {
-            super(message, cause);
-        }
-    }
+    private final Gson gson;
 
     public RepositorioPaciente() {
+        this.gson = new GsonBuilder().setPrettyPrinting().create();
         this.pacientes = new ArrayList<>();
-        try {
-            cargarPacientes();
-        } catch (PersistenciaException e) {
-            System.err.println("Error inicial al cargar pacientes: " + e.getMessage());
-        }
+        cargarPacientes();
     }
 
-    private void cargarPacientes() throws PersistenciaException {
-        File archivo = new File(rutaArchivo);
+    private void cargarPacientes() {
+        File archivo = new File(RUTA_ARCHIVO);
         if (!archivo.exists()) {
+            System.out.print("El archivo no fue encontrado, se creara uno al guardar");
             return;
         }
 
-        try (BufferedReader br = new BufferedReader(new FileReader(archivo))) {
-            String linea;
-            boolean esHeader = true;
-            while ((linea = br.readLine()) != null) {
-                linea = linea.trim();
-                if (linea.isEmpty() || (esHeader && linea.startsWith("rut"))) {
-                    esHeader = false;
-                    continue;
-                }
-                esHeader = false;
-                try {
-                    String[] datos = linea.split(";");
-                    if (datos.length < 4) {
-                        throw new IllegalArgumentException("Linea invalida (menos de 4 campos): " + linea);
-                    }
-                    String rut = datos[0].replaceAll("^\"|\"$", "").trim();
-                    String nombre = datos[1].replaceAll("^\"|\"$", "").trim();
-                    int edad = Integer.parseInt(datos[2].trim());
-                    String clave = datos[3].replaceAll("^\"|\"$", "").trim();
-
-                    Paciente p = new Paciente(rut, nombre, edad, clave);
-                    pacientes.add(p);
-                } catch (Exception e) {
-                    System.err.println("Linea CSV ignorada: " + linea + " - " + e.getMessage());
-                }
+        try (Reader reader = new BufferedReader(new FileReader(archivo))) {
+            Type listType = new TypeToken<ArrayList<Paciente>>() {
+            }.getType();
+            List<Paciente> datos = gson.fromJson(reader, listType);
+            if (datos != null) {
+                this.pacientes = datos;
             }
         } catch (IOException e) {
-            throw new PersistenciaException("Error al cargar pacientes desde " + rutaArchivo + ": " + e.getMessage(), e);
+            System.err.println("Error al leer el archivo: " + e.getMessage());
+            intentarRecuperarBackup();
+        } catch (Exception e) {
+            System.err.println("Error con el archivo JSON: " + e.getMessage());
         }
     }
 
-    private void guardarPacientes() throws PersistenciaException {
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter(rutaArchivo))) {
-            bw.write("rut;nombre;edad;clave");
-            bw.newLine();
-            for (Paciente p : pacientes) {
-                String rutEsc = "\"" + p.getRut().replace("\"", "\"\"") + "\"";
-                String nombreEsc = "\"" + p.getNombre().replace("\"", "\"\"") + "\"";
-                String claveEsc = "\"" + p.getClave().replace("\"", "\"\"") + "\"";
-                String linea = rutEsc + ";" + nombreEsc + ";" + p.getEdad() + ";" + claveEsc;
-                bw.write(linea);
-                bw.newLine();
+    private void intentarRecuperarBackup() {
+        File backup = new File(RUTA_BACKUP);
+        if (backup.exists()) {
+            System.out.println("Intentando recuperar datos...");
+            try (Reader reader = new BufferedReader(new FileReader(backup))) {
+                Type listType = new TypeToken<ArrayList<Paciente>>() {
+                }.getType();
+                this.pacientes = gson.fromJson(reader, listType);
+                System.out.println("Recuperacion exitosa");
+            } catch (IOException e) {
+                System.err.println("Error al leer el archivo: " + e.getMessage());
             }
-        } catch (IOException e) {
-            throw new PersistenciaException("Error al guardar pacientes en " + rutaArchivo + ": " + e.getMessage(), e);
+        } else {
+            System.out.println("No existe un backup disponible para recuperar");
         }
     }
 
-    public String registrarPaciente(String rut, String nombre, int edad, String clave) {
-        try {
-            if (existePaciente(rut)) {
-                return "ERROR: Paciente con RUT '" + rut + "' ya existe";
+    private void guardarPacientes() {
+        File archivo = new File(RUTA_ARCHIVO);
+        if (archivo.exists()) {
+            try {
+                Files.copy(archivo.toPath(), new File(RUTA_BACKUP).toPath(), StandardCopyOption.REPLACE_EXISTING);
+            } catch (IOException e) {
+                System.err.println("No se pudo crear el backup: " + e.getMessage());
             }
-            Paciente p = new Paciente(rut, nombre, edad, clave);
-            pacientes.add(p);
-            guardarPacientes();
-            return "EXITO: Paciente '" + nombre + "' (RUT: " + rut + ") registrado correctamente";
-        } catch (IllegalArgumentException e) {
-            return "ERROR de validacion: " + e.getMessage();
-        } catch (PersistenciaException e) {
-            return "ERROR de persistencia: " + e.getMessage();
         }
+        try (Writer writer = new BufferedWriter(new FileWriter(RUTA_ARCHIVO))) {
+            gson.toJson(this.pacientes, writer);
+        } catch (IOException e) {
+            System.err.println("Error al guardar el archivo paciente: " + e.getMessage());
+        }
+    }
+
+    public String registrarPaciente(String rut, String nombre, int edad) {
+        if (existePaciente(rut)) {
+            return "ERROR: Paciente con RUT" + rut + "ya existe";
+        }
+        Paciente p = new Paciente(rut, nombre, edad);
+        pacientes.add(p);
+        guardarPacientes();
+        return "EXITO: Paciente registrado correctamente";
     }
 
     public boolean existePaciente(String rut) {
-        if (rut == null || rut.trim().isEmpty()) {
-            return false;
-        }
-        return pacientes.stream().anyMatch(p -> p.getRut().equalsIgnoreCase(rut.trim()));
+        if (rut == null) return false;
+        return pacientes.stream().anyMatch(p -> p.getRut().equalsIgnoreCase(rut));
     }
 
     public Optional<Paciente> buscarPaciente(String rut) {
-        if (rut == null || rut.trim().isEmpty()) {
-            return Optional.empty();
-        }
+        if (rut == null) return Optional.empty();
         return pacientes.stream()
-                .filter(p -> p.getRut().equalsIgnoreCase(rut.trim()))
+                .filter(p -> p.getRut().equalsIgnoreCase(rut))
                 .findFirst();
     }
 
-    public String guardarPaciente(Paciente p) {
-        try {
-            if (p == null) {
-                return "ERROR: Paciente no puede ser nulo";
-            }
-            Optional<Paciente> optExistente = buscarPaciente(p.getRut());
-            if (optExistente.isPresent()) {
-                Paciente existente = optExistente.get();
-                existente.setNombre(p.getNombre());
-                existente.setEdad(p.getEdad());
-                existente.setClave(p.getClave());
-            } else {
-                pacientes.add(p);
-            }
-            guardarPacientes();
-            return "EXITO: Paciente '" + p.getNombre() + "' guardado/actualizado";
-        } catch (IllegalArgumentException e) {
-            return "ERROR de validacion: " + e.getMessage();
-        } catch (PersistenciaException e) {
-            return "ERROR de persistencia: " + e.getMessage();
-        }
-    }
-
     public List<Paciente> listarPacientes() {
-        return Collections.unmodifiableList(new ArrayList<>(pacientes));
-    }
-
-    public String eliminarPaciente(String rut) {
-        if (!existePaciente(rut)) {
-            return "ERROR: Paciente con RUT '" + rut + "' no existe";
-        }
-        pacientes.removeIf(p -> p.getRut().equalsIgnoreCase(rut));
-        try {
-            guardarPacientes();
-            return "EXITO: Paciente con RUT '" + rut + "' eliminado";
-        } catch (PersistenciaException e) {
-            return "ERROR de persistencia al eliminar: " + e.getMessage();
-        }
+        return Collections.unmodifiableList(pacientes);
     }
 }
