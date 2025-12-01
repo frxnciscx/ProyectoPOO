@@ -5,10 +5,7 @@ public class Insulina extends Medicamento {
 
     public Insulina(String nombre, int dosis, int cantidad, String fechaVencimiento, double glucosaMinima) {
         super(nombre, dosis, cantidad, fechaVencimiento);
-        if (glucosaMinima <= 0) {
-            throw new IllegalArgumentException("La glucosa minima debe ser mayor a 0 mg/dL");
-        }
-        this.glucosaMinima = glucosaMinima;
+        setGlucosaMinima(glucosaMinima);
     }
 
     //Verificar si se puede tomar (glucosa >= minima)
@@ -17,8 +14,8 @@ public class Insulina extends Medicamento {
     }
 
     @Override
-    public String obtenerTexto() {
-        return super.obtenerTexto() + " [Insulina - Glucosa minima: " + glucosaMinima + " mg/dL]";
+    public String toFormattedString() {
+        return super.toFormattedString() + " [Insulina - Glucosa minima: " + glucosaMinima + " mg/dL]";
     }
 
     //getter y setter para glucosa
@@ -31,11 +28,6 @@ public class Insulina extends Medicamento {
             throw new IllegalArgumentException("La glucosa minima debe ser mayor a 0 mg/dL");
         }
         this.glucosaMinima = glucosaMinima;
-    }
-
-    @Override
-    public String toString() {
-        return "Insulina{" + super.toString() + ", glucosaMinima=" + glucosaMinima + "}";
     }
 
     @Override

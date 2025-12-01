@@ -2,17 +2,18 @@ package proyecto.modelo;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
 public class Paciente {
-    private String rut;
+    private final String rut;
     private String nombre;
     private int edad;
     private String clave;
-    private List<Medicamento> listaMedicamentos;
-    private List<Recordatorio> listaRecordatorios;
-    private HistorialMedico historial;
+    private final List<Medicamento> listaMedicamentos;
+    private final List<Recordatorio> listaRecordatorios;
+    private final HistorialMedico historial;
 
     public Paciente(String rut, String nombre, int edad, String clave) {
         if (rut == null || rut.trim().isEmpty()) {
@@ -21,20 +22,11 @@ public class Paciente {
         if (!rut.matches("\\d{7,8}-?\\d{1}")) {
             throw new IllegalArgumentException("Formato de RUT invalido (ej 12345678-9)");
         }
-        if (nombre == null || nombre.trim().isEmpty()) {
-            throw new IllegalArgumentException("El nombre no puede ser nulo o vacio");
-        }
-        if (edad < 0 || edad > 150) {
-            throw new IllegalArgumentException("La edad debe ser entre 0 y 150");
-        }
-        if (clave == null || clave.length() < 4) {
-            throw new IllegalArgumentException("La clave debe tener al menos 4 caracteres");
-        }
+        setNombre(nombre);
+        setEdad(edad);
+        setClave(clave);
 
         this.rut = rut.trim().toUpperCase();
-        this.nombre = nombre.trim();
-        this.edad = edad;
-        this.clave = clave;
         this.listaMedicamentos = new ArrayList<>();
         this.listaRecordatorios = new ArrayList<>();
         this.historial = new HistorialMedico();
@@ -117,83 +109,84 @@ public class Paciente {
 
     public List<String> verificarRecordatoriosActivos() {
         List<String> activos = new ArrayList<>();
-        LocalDateTime ahora = LocalDateTime.now();
         for (Recordatorio r : listaRecordatorios) {
             if (r.esHoraDeTomar()) {
-                activos.add("Activo: " + r.obtenerTexto());
+                activos.add("Activo: " + r.toFormattedString());
             }
         }
         return activos;
     }
 
-    public String obtenerTextoMedicamentos() {
+    public String toFormattedMedicamentos() {
         if (listaMedicamentos.isEmpty()) {
             return "No hay medicamentos registrados";
         }
         StringBuilder sb = new StringBuilder("Medicamentos:\n");
         for (Medicamento m : listaMedicamentos) {
-            sb.append("- ").append(m.getNombre()).append(" (Dosis: ").append(m.getDosis())
-                    .append(", Stock: ").append(m.getCantidad()).append(", Vence: ").append(m.getFechaVencimiento())
-                    .append(" - ").append(m.estaVencido() ? "VENCIDO" : "Valido").append(")\n");
-            if (m instanceof Insulina) {
-                Insulina ins = (Insulina) m;
-                sb.append("  Glucosa minima: ").append(ins.getGlucosaMinima()).append(" mg/dL\n");
-            }
+            sb.append("- ").append(m.toFormattedString()).append("\n");
         }
         return sb.toString();
     }
 
-    public String obtenerTextoRecordatorios() {
+    public String toFormattedRecordatorios() {
         if (listaRecordatorios.isEmpty()) {
             return "No hay recordatorios configurados";
         }
         StringBuilder sb = new StringBuilder("Recordatorios:\n");
         for (Recordatorio r : listaRecordatorios) {
-            sb.append(r.obtenerTexto()).append("\n");
+            sb.append(r.toFormattedString()).append("\n");
         }
         return sb.toString();
     }
 
-    public String obtenerTextoHistorial() {
-        return historial.obtenerTexto();
+    public String toFormattedHistorial() {
+        return historial.toFormattedString();
     }
 
     public String getRut() { return rut; }
-    public void setRut(String rut) { this.rut = rut; }
 
     public String getNombre() { return nombre; }
+
     public void setNombre(String nombre) {
-        if (nombre == null || nombre.trim().isEmpty()) {
-            throw new IllegalArgumentException("El nombre no puede ser nulo o vacio");
-        }
+        if (nombre == null || nombre.trim().isEmpty()) throw new IllegalArgumentException("El nombre no puede ser nulo o vacio");
         this.nombre = nombre.trim();
     }
 
     public int getEdad() { return edad; }
+
     public void setEdad(int edad) {
         if (edad < 0 || edad > 150) {
             throw new IllegalArgumentException("La edad debe ser entre 0 y 150");
-        }
         this.edad = edad;
     }
 
     public String getClave() { return clave; }
+
     public void setClave(String clave) {
-        if (clave == null || clave.length() < 4) {
-            throw new IllegalArgumentException("La clave debe tener al menos 4 caracteres");
-        }
-        this.clave = clave;
+        if (clave == null || clave.length() < 4) {throw new IllegalArgumentException("La clave debe tener al menos 4 caracteres");
+            this.clave = clave;
     }
 
-    public List<Medicamento> getListaMedicamentos() {
-        return new ArrayList<>(listaMedicamentos);
-    }
+    public List<Medicamento> getListaMedicamentos() { return Collections.unmodifiableList(listaMedicamentos); }
 
-    public List<Recordatorio> getListaRecordatorios() {
-        return new ArrayList<>(listaRecordatorios);
-    }
+    public List<Recordatorio> getListaRecordatorios() { return Collections.unmodifiableList(listaRecordatorios); }
 
     public HistorialMedico getHistorial() { return historial; }
+
+
+    public void cargarMedicamento(Medicamento m) {
+         if (m != null) listaMedicamentos.add(m);
+    }
+
+    public void cargarRecordatorio(Recordatorio r) {
+         if (r != null) listaRecordatorios.add(r);
+    }
+
+    public void limpiarDatosCargados() {
+         listaMedicamentos.clear();
+         listaRecordatorios.clear();
+         historial.limpiar();
+    }
 
     @Override
     public String toString() {
@@ -204,3 +197,4 @@ public class Paciente {
         return rut + ";" + nombre + ";" + edad + ";" + clave;
     }
 }
+

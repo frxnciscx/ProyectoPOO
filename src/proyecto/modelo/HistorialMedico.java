@@ -1,5 +1,7 @@
 package proyecto.modelo;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -19,7 +21,14 @@ public class HistorialMedico {
         registros.add(registroConTiempo);
     }
 
-    public String obtenerTexto() {
+    public void agregarRegistroDirecto(String registroCompleto) {
+        if (registroCompleto == null || registroCompleto.trim().isEmpty()) {
+            return;
+        }
+        registros.add(registroCompleto.trim());
+    }
+
+    public String toFormattedString() {
         if (registros.isEmpty()) {
             return "No hay registros en el historial";
         }
@@ -39,10 +48,6 @@ public class HistorialMedico {
     }
 
     //toString para depuracion
-    @Override
-    public String toString() {
-        return "HistorialMedico{" + "registros=" + registros.size() + " entradas}";
-    }
 
     public String toCSV() {
         StringBuilder sb = new StringBuilder();
@@ -51,5 +56,10 @@ public class HistorialMedico {
             sb.append(msgEsc).append("\n");
         }
         return sb.toString();
+    }
+
+    @Override
+    public String toString() {
+        return "HistorialMedico{" + "registros=" + registros.size() + " entradas}";
     }
 }

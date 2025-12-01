@@ -3,11 +3,13 @@ package proyecto.modelo;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
+import java.util.List;
+import java.util.Optional;
 
 public class Recordatorio {
-    private LocalTime hora;
-    private int frecuenciaHoras;
-    private Medicamento medicamentoAsociado;
+    private final LocalTime hora;
+    private final int frecuenciaHoras;
+    private final Medicamento medicamentoAsociado;
     private LocalDateTime ultimaToma;
 
     public Recordatorio(LocalTime hora, int frecuenciaHoras, Medicamento medicamentoAsociado) {
@@ -77,5 +79,26 @@ public class Recordatorio {
 
     public String toCSV() {
         return hora.format(DateTimeFormatter.ofPattern("HH:mm")) + ";" + frecuenciaHoras + ";" + medicamentoAsociado.getNombre();
+    }
+
+    public static Recordatorio fromCSV(String lineaCSV, List<Medicamento> medicamentosPaciente) {
+        String[] parte = lineaCSV.split(";");
+        if (parte.length != 3) {
+            throw new IllegalArgumentException("Linea CSV invalida para Recordatorio");
+        }
+
+        LocalTime hora = LocalTime.parse(parte[0], DateTimeFormatter.ofPattern("HH:mm"));
+        int frecuencia = Integer.parseInt(parte[1]);
+        String nombreMed = parte[2];
+
+        Optional<Medicamento> medAsociado = medicamentosPaciente.stream()
+                .filter(m -> m.getNombre().equalsIgnoreCase(nombreMed))
+                .findFirst();
+
+        if (medAsociado.isEmpty()) {
+            throw new IllegalArgumentException("No se encontro el medicamento '" + nombreMed + "'");
+        }
+
+        return new Recordatorio(hora, frecuencia, medAsociado.get());
     }
 }

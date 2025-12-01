@@ -3,6 +3,7 @@ package proyecto.modelo;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
+import java.util.Objects;
 
 public class Medicamento {
     private String nombre;
@@ -10,25 +11,11 @@ public class Medicamento {
     private int cantidad; //stock disponible
     private String fechaVencimiento; //formato: dd/MM/yyyy
 
-    //constructor con validaciones
     public Medicamento(String nombre, int dosis, int cantidad, String fechaVencimiento) {
-        if (nombre == null || nombre.trim().isEmpty()) {
-            throw new IllegalArgumentException("El nombre del medicamento no puede ser nulo o vacio");
-        }
-        if (dosis <= 0) {
-            throw new IllegalArgumentException("La dosis debe ser mayor a 0");
-        }
-        if (cantidad < 0) {
-            throw new IllegalArgumentException("La cantidad no puede ser negativa");
-        }
-        if (fechaVencimiento == null || fechaVencimiento.trim().isEmpty()) {
-            throw new IllegalArgumentException("La fecha de vencimiento no puede ser nula o vacia");
-        }
-
-        this.nombre = nombre.trim();
-        this.dosis = dosis;
-        this.cantidad = cantidad;
-        this.fechaVencimiento = fechaVencimiento.trim();
+        setNombre(nombre);
+        setDosis(dosis);
+        setCantidad(cantidad);
+        setFechaVencimiento(fechaVencimiento);
     }
 
     //verifica si esta vencido
@@ -52,12 +39,14 @@ public class Medicamento {
         }
     }
 
-    public String obtenerTexto() {
-        return nombre + " - Dosis: " + dosis + " mg, Stock: " + cantidad + ", Vence: " + fechaVencimiento +
-                (estaVencido() ? " (VENCIDO)" : "");
+    //Presentación amigable para vistas.//
+
+    public String toFormattedString() {
+        return nombre + " - Dosis: " + dosis + " mg, Stock: " + cantidad + ", Vence: " + fechaVencimiento
+                + (estaVencido() ? " (VENCIDO)" : "");
     }
 
-    //getters y setters con validaciones
+    // JavaBean getters/setters (validaciones dentro de setters)
     public String getNombre() {
         return nombre;
     }
@@ -122,5 +111,18 @@ public class Medicamento {
         } catch (Exception e) {
             throw new IllegalArgumentException("Error al cargar Medicamento desde historial: " + e.getMessage(), e);
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Medicamento)) return false;
+        Medicamento that = (Medicamento) o;
+        return nombre.equalsIgnoreCase(that.nombre);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(nombre.toLowerCase());
     }
 }
