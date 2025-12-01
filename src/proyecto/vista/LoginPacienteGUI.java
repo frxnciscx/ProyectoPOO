@@ -3,7 +3,6 @@ package proyecto.vista;
 import proyecto.controlador.ControladorPaciente;
 import proyecto.controlador.ControladorMedicamento;
 import proyecto.modelo.Paciente;
-
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
@@ -13,14 +12,13 @@ import java.util.Optional;
 public class LoginPacienteGUI extends JFrame {
     private final ControladorPaciente controlador;
     private JTextField txtRut;
-    private JPasswordField txtClave;
     private JButton btnLogin;
 
     public LoginPacienteGUI(ControladorPaciente controlador) {
         this.controlador = controlador;
 
         setTitle("Login Paciente");
-        setSize(400, 250);
+        setSize(400, 200);
         setLocationRelativeTo(null);
 
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -61,18 +59,6 @@ public class LoginPacienteGUI extends JFrame {
         gbc.weightx = 1.0;
         panel.add(txtRut, gbc);
 
-        JLabel lblClave = new JLabel("Clave:");
-        gbc.gridx = 0;
-        gbc.gridy = 2;
-        gbc.weightx = 0.0;
-        panel.add(lblClave, gbc);
-
-        txtClave = new JPasswordField();
-        gbc.gridx = 1;
-        gbc.gridy = 2;
-        gbc.weightx = 1.0;
-        panel.add(txtClave, gbc);
-
         btnLogin = new JButton("Entrar");
         gbc.gridx = 0;
         gbc.gridy = 3;
@@ -86,15 +72,14 @@ public class LoginPacienteGUI extends JFrame {
 
     private void procesarLogin() {
         String rut = txtRut.getText().trim();
-        String clave = new String(txtClave.getPassword()).trim();
 
-        if (rut.isEmpty() || clave.isEmpty()) {
-            JOptionPane.showMessageDialog(this, "RUT y clave son obligatorios", "Error", JOptionPane.ERROR_MESSAGE);
+        if (rut.isEmpty()) {
+            JOptionPane.showMessageDialog(this, "RUT es obligatorio", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
-        String msgLogin = controlador.procesarLogin(rut, clave);
-        Optional<Paciente> optPaciente = controlador.loginPaciente(rut, clave);
+        String msgLogin = controlador.procesarLogin(rut);
+        Optional<Paciente> optPaciente = controlador.loginPaciente(rut);
 
         if (optPaciente.isPresent()) {
             JOptionPane.showMessageDialog(this, msgLogin, "Exito", JOptionPane.INFORMATION_MESSAGE);
@@ -104,7 +89,6 @@ public class LoginPacienteGUI extends JFrame {
             dispose();
         } else {
             JOptionPane.showMessageDialog(this, msgLogin, "Error de Login", JOptionPane.ERROR_MESSAGE);
-            txtClave.setText("");
         }
     }
 }
