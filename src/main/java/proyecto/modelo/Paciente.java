@@ -16,9 +16,9 @@ public class Paciente {
         if (rut == null || rut.trim().isEmpty()) {
             throw new IllegalArgumentException("El RUT no puede ser nulo o vacio");
         }
-        //CORRECCION: ahora acepta digitos (0-9) y las letras k/K en el digito verificador
-        if (!rut.matches("\\d{7,8}-?\\d{1}")) {
-            throw new IllegalArgumentException("Formato de RUT invalido (ej 12345678-9)");
+        //CORRECCION: ahora acepta numeros o K al final
+        if (!rut.matches("\\d{7,8}-?\\d{0-9kK}")) {
+            throw new IllegalArgumentException("Formato de RUT invalido (ej 12345678-9 o 12345678-K)");
         }
         if (nombre == null || nombre.trim().isEmpty()) {
             throw new IllegalArgumentException("El nombre no puede ser nulo o vacio");
@@ -27,7 +27,7 @@ public class Paciente {
             throw new IllegalArgumentException("La edad debe ser entre 1 y 99");
         }
 
-        this.rut = rut.trim().toUpperCase();
+        this.rut = rut.trim().toUpperCase(); //convierte k minuscula a K
         this.nombre = nombre.trim();
         this.edad = edad;
         this.listaMedicamentos = new ArrayList<>();
