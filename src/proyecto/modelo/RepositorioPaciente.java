@@ -1,12 +1,15 @@
 package proyecto.modelo;
 
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
+import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
 import java.io.*;
 import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -19,7 +22,48 @@ public class RepositorioPaciente {
     private final Gson gson;
 
     public RepositorioPaciente() {
-        this.gson = new GsonBuilder().setPrettyPrinting().create();
+        //CORRECCION: configuracion del GSON para manejar fechas
+        this.gson = new GsonBuilder()
+                .setPrettyPrinting()
+                .registerTypeAdapter(LocalTime.class, new JsonSerializer<LocalTime>() {
+                    @Override
+                    public JsonElement serialize(LocalTime src, Type typeOfSrc, JsonSerializationContext context) {
+                        return new JsonPrimitive(src.format(DateTimeFormatter.ISO_LOCAL_TIME));
+                    }
+                })
+                .registerTypeAdapter(LocalTime.class, new JsonDeserializer<LocalTime>() {
+                    @Override
+                    public LocalTime deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+                        return LocalTime.parse(json.getAsString(), DateTimeFormatter.ISO_LOCAL_TIME);
+                    }
+                })
+                .registerTypeAdapter(LocalDate.class, new JsonSerializer<LocalDate>() {
+                    @Override
+                    public JsonElement serialize(LocalDate src, Type typeOfSrc, JsonSerializationContext context) {
+                        return new JsonPrimitive(src.format(DateTimeFormatter.ISO_LOCAL_DATE));
+                    }
+                })
+                .registerTypeAdapter(LocalDate.class, new JsonDeserializer<LocalDate>() {
+                    @Override
+                    public LocalDate deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+                        return LocalDate.parse(json.getAsString(), DateTimeFormatter.ISO_LOCAL_DATE);
+                    }
+                })
+                // Adaptador para LocalDateTime (Fecha y Hora)
+                .registerTypeAdapter(LocalDateTime.class, new JsonSerializer<LocalDateTime>() {
+                    @Override
+                    public JsonElement serialize(LocalDateTime src, Type typeOfSrc, JsonSerializationContext context) {
+                        return new JsonPrimitive(src.format(DateTimeFormatter.ISO_LOCAL_DATE_TIME));
+                    }
+                })
+                .registerTypeAdapter(LocalDateTime.class, new JsonDeserializer<LocalDateTime>() {
+                    @Override
+                    public LocalDateTime deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+                        return LocalDateTime.parse(json.getAsString(), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
+                    }
+                })
+                .create();
+
         this.pacientes = new ArrayList<>();
         cargarPacientes();
     }
