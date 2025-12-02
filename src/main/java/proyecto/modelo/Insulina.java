@@ -16,16 +16,16 @@ public class Insulina extends Medicamento {
         return glucosaActual >= glucosaMinima && !estaVencido() && getCantidad() > 0;
     }
 
+    //CORRECCION: uso de @Override y nombre correcto
     @Override
-    public String obtenerTexto() {
-        return super.obtenerTexto() + " [Insulina - Glucosa minima: " + glucosaMinima + " mg/dL]";
+    public String formatearInformacion() {
+        return super.formatearInformacion() + " [Insulina - Glucosa minima: " + glucosaMinima + " mg/dL]";
     }
 
-    //getter y setter para glucosa
+    //GETTERS Y SETTERS
     public double getGlucosaMinima() {
         return glucosaMinima;
     }
-
     public void setGlucosaMinima(double glucosaMinima) {
         if (glucosaMinima <= 0) {
             throw new IllegalArgumentException("La glucosa minima debe ser mayor a 0 mg/dL");

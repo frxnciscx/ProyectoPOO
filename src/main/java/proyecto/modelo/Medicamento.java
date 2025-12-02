@@ -52,12 +52,12 @@ public class Medicamento {
         }
     }
 
-    public String obtenerTexto() {
-        return nombre + " - Dosis: " + dosis + " mg, Stock: " + cantidad + ", Vence: " + fechaVencimiento +
-                (estaVencido() ? " (VENCIDO)" : "");
+    //CAMBIO: renombrar metodo por buena practica, paso de obtenerTexto a formatearInformacion
+    public String formatearInformacion() {
+        return nombre + " - Dosis: " + dosis + " mg, Stock: " + cantidad + ", Vence: " + fechaVencimiento + (estaVencido() ? " (VENCIDO)" : "");
     }
 
-    //getters y setters con validaciones
+    //GETTERS Y SETTERS
     public String getNombre() {
         return nombre;
     }
@@ -98,7 +98,6 @@ public class Medicamento {
         this.fechaVencimiento = fechaVencimiento.trim();
     }
 
-    //depuración
     @Override
     public String toString() {
         return "Medicamento{" + "nombre='" + nombre + "', dosis=" + dosis + ", cantidad=" + cantidad + ", fechaVencimiento='" + fechaVencimiento + "'}";

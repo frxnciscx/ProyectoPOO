@@ -2,7 +2,6 @@ package proyecto.vista;
 
 import proyecto.modelo.Paciente;
 import proyecto.modelo.Recordatorio;
-
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -43,7 +42,7 @@ public class RecordatorioTimer {
                         String resultado = gui.getControladorMed().tomarMedicamento(nombreMed);
                         if (resultado.startsWith("EXITO")) {
                             r.registrarTomado();
-                            JOptionPane.showMessageDialog(gui, resultado + "\nRecordatorio marcado como tomado.",
+                            JOptionPane.showMessageDialog(gui, resultado + "\nRecordatorio marcado como tomado",
                                     "Toma Registrada", JOptionPane.INFORMATION_MESSAGE);
                             gui.actualizarTodo();
                         } else {
@@ -53,7 +52,7 @@ public class RecordatorioTimer {
                         gui.getControladorMed().getPaciente().getHistorial().agregarRegistro(
                                 "Recordatorio ignorado para " + nombreMed + " a las " + r.getHora());
                         gui.actualizarHistorialArea();
-                        JOptionPane.showMessageDialog(gui, "Recordatorio ignorado. Se registro en historial.",
+                        JOptionPane.showMessageDialog(gui, "Recordatorio ignorado",
                                 "Info", JOptionPane.INFORMATION_MESSAGE);
                     }
                 });

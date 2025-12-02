@@ -1,6 +1,6 @@
 package proyecto.vista;
 
-import proyecto.controlador.ControladorMedicamentos;
+import proyecto.controlador.ControladorMedicamento;
 import proyecto.modelo.Medicamento;
 import proyecto.modelo.Insulina;
 import proyecto.modelo.Paciente;
@@ -8,26 +8,22 @@ import proyecto.modelo.Recordatorio;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
-import proyecto.vista.PantallaInicio;
 
 public class GestionMedicamentosGUI extends JFrame {
-
     private final Paciente paciente;
-    private final ControladorMedicamentos controladorMed;
+    private final ControladorMedicamento controladorMed;
     private JComboBox<String> comboMedicamentos;
     private JTextArea medicamentosArea;
     private JTextArea historialArea;
     private JTextArea recordatoriosArea;
     private RecordatorioTimer recordatorioTimer;
 
-    public GestionMedicamentosGUI(ControladorMedicamentos controladorMed, Paciente paciente) {
+    public GestionMedicamentosGUI(ControladorMedicamento controladorMed, Paciente paciente) {
         this.controladorMed = controladorMed;
         this.paciente = paciente;
         setTitle("Gestion de Medicamentos - " + paciente.getNombre());
@@ -35,7 +31,6 @@ public class GestionMedicamentosGUI extends JFrame {
         setLocationRelativeTo(null);
 
         setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-
         initComponents();
         actualizarMedicamentosArea();
         actualizarHistorialArea();
@@ -50,14 +45,12 @@ public class GestionMedicamentosGUI extends JFrame {
                 cerrarSesion();
             }
         });
-
         cargarComboMedicamentos();
     }
 
     private void initComponents() {
         JPanel panel = new JPanel();
         panel.setLayout(new BorderLayout());
-
         panel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
 
         JSplitPane splitNorte = new JSplitPane(JSplitPane.VERTICAL_SPLIT);
@@ -131,25 +124,21 @@ public class GestionMedicamentosGUI extends JFrame {
     private void cargarComboMedicamentos() {
         comboMedicamentos.removeAllItems();
         Object seleccionado = comboMedicamentos.getSelectedItem();
-
-        String textoMeds = controladorMed.obtenerTextoMedicamentos();
-        if (textoMeds.equals("No hay medicamentos registrados")) {
+        //MEJORA: usar el metodo para que devuelta la lista directa, sin procesar texto
+        List<String> nombres = controladorMed.listarNombresMedicamentos();
+        if (nombres.isEmpty()) {
             comboMedicamentos.setEnabled(false);
             return;
         }
-
         comboMedicamentos.setEnabled(true);
-        for (String linea : textoMeds.split("\n")) {
-            if (linea.contains("- ") && linea.contains("(")) {
-                String nombre = linea.substring(2, linea.indexOf(" (")).trim();
-                if (!nombre.isEmpty()) {
-                    comboMedicamentos.addItem(nombre);
-                }
-            }
+        for (String nombre : nombres ) {
+            comboMedicamentos.addItem(nombre);
         }
-
         if (seleccionado != null) {
-            comboMedicamentos.setSelectedItem(seleccionado);
+            //se verifica si el medicamento seleccionado aun existe en la nueva lista
+            if (nombres.contains(seleccionado)) {
+                comboMedicamentos.setSelectedItem(seleccionado);
+            }
         }
     }
 
@@ -195,7 +184,6 @@ public class GestionMedicamentosGUI extends JFrame {
 
         int result = JOptionPane.showConfirmDialog(this, panelInput, "Agregar Medicamento", JOptionPane.OK_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE);
         if (result != JOptionPane.OK_OPTION) return;
-
         try {
             String nombre = txtNombre.getText().trim();
             if (nombre.isEmpty()) throw new IllegalArgumentException("Nombre requerido");
@@ -206,7 +194,6 @@ public class GestionMedicamentosGUI extends JFrame {
             if (!fecha.matches("\\d{2}/\\d{2}/\\d{4}")) {
                 throw new IllegalArgumentException("Formato de fecha invalido (dd/MM/yyyy)");
             }
-
             Medicamento m;
             if ("Insulina".equals(comboTipo.getSelectedItem())) {
                 double glucMin = Double.parseDouble(txtGlucosa.getText().trim());
@@ -214,7 +201,6 @@ public class GestionMedicamentosGUI extends JFrame {
             } else {
                 m = new Medicamento(nombre, dosis, cantidad, fecha);
             }
-
             String msg = controladorMed.agregarMedicamento(m);
             JOptionPane.showMessageDialog(this, msg, "Resultado", JOptionPane.INFORMATION_MESSAGE);
             actualizarTodo();
@@ -231,7 +217,6 @@ public class GestionMedicamentosGUI extends JFrame {
             JOptionPane.showMessageDialog(this, "Primero selecciona un medicamento del ComboBox", "Error", JOptionPane.WARNING_MESSAGE);
             return;
         }
-
         String horaStr = JOptionPane.showInputDialog(this, "Hora (HH:mm) para " + nombreMed + ":");
         if (horaStr == null || !horaStr.matches("\\d{2}:\\d{2}")) {
             if(horaStr != null)
@@ -249,7 +234,6 @@ public class GestionMedicamentosGUI extends JFrame {
             JOptionPane.showMessageDialog(this, "Frecuencia invalida (numero >0)", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
-
         Medicamento med = null;
         for (Medicamento m : paciente.getListaMedicamentos()) {
             if (m.getNombre().equalsIgnoreCase(nombreMed.trim())) {
@@ -261,7 +245,6 @@ public class GestionMedicamentosGUI extends JFrame {
             JOptionPane.showMessageDialog(this, "Medicamento '" + nombreMed + "' no encontrado", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
-
         Recordatorio r = new Recordatorio(hora, frecuencia, med);
         String msg = controladorMed.agregarRecordatorio(r);
         JOptionPane.showMessageDialog(this, msg, "Resultado", JOptionPane.INFORMATION_MESSAGE);
@@ -288,7 +271,6 @@ public class GestionMedicamentosGUI extends JFrame {
             JOptionPane.showMessageDialog(this, "Selecciona un medicamento para remover", "Error", JOptionPane.WARNING_MESSAGE);
             return;
         }
-
         int confirm = JOptionPane.showConfirmDialog(this,
                 "¿Estas seguro de que deseas eliminar '" + nombreSeleccionado + "'?",
                 "Confirmar eliminacion",
@@ -303,17 +285,17 @@ public class GestionMedicamentosGUI extends JFrame {
         }
     }
 
+    //CORRECCION: modificacion de nombre de metodos
     public void actualizarMedicamentosArea() {
-        medicamentosArea.setText(controladorMed.obtenerTextoMedicamentos());
+        medicamentosArea.setText(controladorMed.generarReporteMedicamentos());
     }
 
-
     public void actualizarHistorialArea() {
-        historialArea.setText(controladorMed.obtenerTextoHistorial());
+        historialArea.setText(controladorMed.generarReporteHistorial());
     }
 
     public void actualizarRecordatoriosArea() {
-        recordatoriosArea.setText(controladorMed.obtenerTextoRecordatorios());
+        recordatoriosArea.setText(controladorMed.generarReporteRecordatorios());
     }
 
     public void actualizarTodo() {
@@ -322,7 +304,7 @@ public class GestionMedicamentosGUI extends JFrame {
         actualizarRecordatoriosArea();
     }
 
-    public ControladorMedicamentos getControladorMed() {
+    public ControladorMedicamento getControladorMed() {
         return controladorMed;
     }
 
@@ -334,10 +316,8 @@ public class GestionMedicamentosGUI extends JFrame {
         if (recordatorioTimer != null) {
             recordatorioTimer.stop();
         }
-
         PantallaInicio inicio = new PantallaInicio();
         inicio.setVisible(true);
-
         dispose();
     }
 }

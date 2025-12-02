@@ -26,7 +26,8 @@ public class HistorialMedico {
         registros.add(registroCompleto.trim());
     }
 
-    public String obtenerTexto() {
+    //CORRECCION: renombrar obtenerTexto por formatearHistorial
+    public String formatearHistorial() {
         if (registros.isEmpty()) {
             return "No hay registros en el historial";
         }
@@ -45,7 +46,6 @@ public class HistorialMedico {
         registros.clear();
     }
 
-    //toString para depuracion
     @Override
     public String toString() {
         return "HistorialMedico{" + "registros=" + registros.size() + " entradas}";

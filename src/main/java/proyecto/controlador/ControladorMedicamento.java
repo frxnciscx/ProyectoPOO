@@ -6,11 +6,11 @@ import proyecto.modelo.Recordatorio;
 import proyecto.modelo.GestorDatosPaciente;
 import java.util.List;
 
-public class ControladorMedicamentos {
+public class ControladorMedicamento {
     private final Paciente paciente;
     private final GestorDatosPaciente gestorDatos;
 
-    public ControladorMedicamentos(Paciente paciente) {
+    public ControladorMedicamento(Paciente paciente) {
         if (paciente == null) {
             throw new IllegalArgumentException("El paciente no puede ser nulo");
         }
@@ -47,9 +47,10 @@ public class ControladorMedicamentos {
             if (r == null) {
                 return "ERROR: El recordatorio no puede ser nulo";
             }
-            if (!paciente.getListaMedicamentos().stream().anyMatch(existing ->
+            //verificar si el medicamento existe
+            if (paciente.getListaMedicamentos().stream().noneMatch(existing ->
                     existing.getNombre().equalsIgnoreCase(r.getMedicamentoAsociado().getNombre()))) {
-                return "ERROR: El medicamento asociado al recordatorio no esta registrado";
+                return "ERROR: El medicamento no se encuentra registrado";
             }
             String resultado = paciente.agregarRecordatorio(r);
             if (resultado.startsWith("EXITO")) {
@@ -68,23 +69,24 @@ public class ControladorMedicamentos {
         return paciente.verificarRecordatoriosActivos();
     }
 
-    public String obtenerTextoMedicamentos() {
-        return paciente.obtenerTextoMedicamentos();
+    //CORRECCION: renombrar metodos para implementar buenas practicas
+    public String generarReporteMedicamentos() {
+        return paciente.generarReporteMedicamentos();
     }
 
-    public String obtenerTextoRecordatorios() {
-        return paciente.obtenerTextoRecordatorios();
+    public String generarReporteRecordatorios() {
+        return paciente.generarReporteRecordatorios();
     }
 
-    public String obtenerTextoHistorial() {
-        return paciente.obtenerTextoHistorial();
+    public String generarReporteHistorial() {
+        return paciente.generarReporteHistorial();
     }
 
     public Paciente getPaciente() {
         return paciente;
     }
 
-    public List<String> obtenerNombresMedicamentos() {
+    public List<String> listarNombresMedicamentos() {
         return paciente.getListaMedicamentos().stream()
                 .map(Medicamento::getNombre)
                 .toList();
