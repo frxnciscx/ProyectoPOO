@@ -13,7 +13,7 @@ class MedicamentoTest {
 
     @Test
     void testMedicamentoNoVencido() {
-        Medicamento m = new Medicamento("Valido", 100, 10, "01/01/2027");
+        Medicamento m = new Medicamento("Válido", 100, 10, "01/01/2027");
         assertFalse(m.estaVencido(), "El medicamento NO deberia estar vencido");
     }
 

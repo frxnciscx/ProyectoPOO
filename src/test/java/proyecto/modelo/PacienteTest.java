@@ -7,10 +7,10 @@ class PacienteTest {
 
     @Test
     void testConstructorValido() {
-        Paciente p = new Paciente("12345678-9", "Juan Perez", 30);
+        Paciente p = new Paciente("12345678-9", "Juan Pérez", 30);
 
         assertNotNull(p);
-        assertEquals("Juan Perez", p.getNombre());
+        assertEquals("Juan Pérez", p.getNombre());
         assertEquals(30, p.getEdad());
         assertEquals("12345678-9", p.getRut());
     }
@@ -20,7 +20,7 @@ class PacienteTest {
         Exception exception = assertThrows(IllegalArgumentException.class, () -> {
             new Paciente("1-1", "Juan", 30);
         });
-        assertTrue(exception.getMessage().contains("Formato de RUT invalido"));
+        assertTrue(exception.getMessage().contains("Formato de RUT inválido"));
     }
 
     @Test

@@ -273,7 +273,7 @@ public class GestionMedicamentosGUI extends JFrame {
         }
         int confirm = JOptionPane.showConfirmDialog(this,
                 "¿Estas seguro de que deseas eliminar '" + nombreSeleccionado + "'?",
-                "Confirmar eliminacion",
+                "Confirmar eliminación",
                 JOptionPane.YES_NO_OPTION,
                 JOptionPane.WARNING_MESSAGE);
 

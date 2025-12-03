@@ -115,7 +115,7 @@ public class RegistroPacienteGUI extends JFrame {
         try {
             edad = Integer.parseInt(edadStr);
         } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(this, "Edad debe ser un numero valido", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Edad debe ser un número válido", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 

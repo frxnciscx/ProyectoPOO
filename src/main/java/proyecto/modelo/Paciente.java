@@ -18,7 +18,7 @@ public class Paciente {
         }
         //CORRECCION: ahora acepta numeros o K al final
         if (!rut.matches("\\d{7,8}-?[0-9kK]")) {
-            throw new IllegalArgumentException("Formato de RUT invalido (ej 12345678-9 o 12345678-K)");
+            throw new IllegalArgumentException("Formato de RUT inválido (ej 12345678-9 o 12345678-K)");
         }
         if (nombre == null || nombre.trim().isEmpty()) {
             throw new IllegalArgumentException("El nombre no puede ser nulo o vacio");

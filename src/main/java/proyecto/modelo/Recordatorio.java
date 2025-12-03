@@ -100,4 +100,8 @@ public class Recordatorio {
 
         return new Recordatorio(hora, frecuencia, medAsociado.get());
     }
+
+    void setUltimaTomaForTesting(LocalDateTime t) {
+        this.ultimaToma = t;
+    }
 }
