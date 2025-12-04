@@ -5,6 +5,8 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyAdapter;
 
 public class RegistroPacienteGUI extends JFrame {
     private JTextField txtRut;
@@ -72,6 +74,15 @@ public class RegistroPacienteGUI extends JFrame {
         panel.add(lblEdad, gbc);
 
         txtEdad = new JTextField(20);
+        txtEdad.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+                char c = e.getKeyChar();
+                if (!Character.isDigit(c) && c != KeyEvent.VK_BACK_SPACE) {
+                    e.consume();
+                }
+            }
+        });
         gbc.gridx = 1;
         gbc.gridy = 3;
         panel.add(txtEdad, gbc);
@@ -115,7 +126,7 @@ public class RegistroPacienteGUI extends JFrame {
         try {
             edad = Integer.parseInt(edadStr);
         } catch (NumberFormatException ex) {
-            JOptionPane.showMessageDialog(this, "Edad debe ser un número válido", "Error", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(this, "Edad debe ser un numero valido", "Error", JOptionPane.ERROR_MESSAGE);
             return;
         }
 
