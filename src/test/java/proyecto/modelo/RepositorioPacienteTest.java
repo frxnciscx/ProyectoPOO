@@ -1,6 +1,8 @@
 package proyecto.modelo;
 
 import org.junit.jupiter.api.Test;
+import proyecto.modelo.datos.RepositorioPaciente;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class RepositorioPacienteTest {

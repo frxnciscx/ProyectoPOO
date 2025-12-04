@@ -1,6 +1,9 @@
-package proyecto.modelo;
+package proyecto.modelo.datos;
 
 import com.google.gson.*;
+import proyecto.modelo.Insulina;
+import proyecto.modelo.Medicamento;
+
 import java.lang.reflect.Type;
 
 public class MedicamentoTypeAdapter implements JsonSerializer<Medicamento>, JsonDeserializer<Medicamento> {
