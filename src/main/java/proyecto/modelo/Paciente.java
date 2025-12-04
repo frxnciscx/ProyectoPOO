@@ -61,11 +61,11 @@ public class Paciente {
                 }
                 m.disminuirCantidad();
                 if (m instanceof Insulina) {
-                    historial.agregarRegistro("Insulina tomada");
+                    historial.agregarRegistro("Dosis de insulina administrada");
                 } else {
-                    historial.agregarRegistro("Dosis tomada");
+                    historial.agregarRegistro("Dosis tomada de " + m.getNombre());
                 }
-                return "Stock de medicamento" + m.getCantidad();
+                return "Stock de medicamento: " + m.getCantidad();
             }
         }
         return "ERROR: medicamento no encontrado";
