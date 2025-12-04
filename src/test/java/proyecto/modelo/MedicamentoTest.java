@@ -6,6 +6,16 @@ import static org.junit.jupiter.api.Assertions.*;
 class MedicamentoTest {
 
     @Test
+    void testMedicamentoValido() {
+        Medicamento m = new Medicamento("Paracetamol", 500, 10, "01/01/2030");
+
+        assertEquals("Paracetamol", m.getNombre());
+        assertEquals(500, m.getDosis());
+        assertEquals(10, m.getCantidad());
+        assertEquals("01/01/2030", m.getFechaVencimiento());
+    }
+
+    @Test
     void testMedicamentoVencido() {
         Medicamento m = new Medicamento("Vencido", 100, 10, "01/11/2025");
         assertTrue(m.estaVencido(), "El medicamento deberia marcarse como vencido");
@@ -33,5 +43,15 @@ class MedicamentoTest {
         assertThrows(IllegalStateException.class, () -> {
             m.disminuirCantidad();
         });
+    }
+
+    @Test
+    void testFromCSV() {
+        String csv = "Paracetamol;500;20;01/01/2030";
+        Medicamento m = Medicamento.fromCSV(csv);
+
+        assertEquals("Paracetamol", m.getNombre());
+        assertEquals(500, m.getDosis());
+        assertEquals(20, m.getCantidad());
     }
 }

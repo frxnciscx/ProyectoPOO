@@ -104,4 +104,9 @@ public class Recordatorio {
     void setUltimaTomaForTesting(LocalDateTime t) {
         this.ultimaToma = t;
     }
+
+    // Solo para pruebas unitarias
+    void setUltimaToma(LocalDateTime dt) {
+        this.ultimaToma = dt;
+    }
 }

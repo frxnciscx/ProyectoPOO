@@ -33,4 +33,13 @@ class InsulinaTest {
             new Insulina("Mala", 10, 5, "01/01/2030", -10.0);
         });
     }
+
+    @Test
+    void testFromCSV() {
+        String csv = "Insulina;10;5;01/01/2030;70.0";
+        Insulina ins = Insulina.fromCSV(csv);
+
+        assertEquals("Insulina", ins.getNombre());
+        assertEquals(70.0, ins.getGlucosaMinima());
+    }
 }

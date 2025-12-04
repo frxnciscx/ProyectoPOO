@@ -1,11 +1,24 @@
 package proyecto.modelo;
 
 import org.junit.jupiter.api.Test;
+import java.lang.reflect.Field;
 import java.time.LocalTime;
 import java.time.LocalDateTime;
+import java.util.List;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 class RecordatorioTest {
+
+    private void setUltimaToma(Recordatorio r, LocalDateTime t) {
+        try {
+            Field f = Recordatorio.class.getDeclaredField("ultimaToma");
+            f.setAccessible(true);
+            f.set(r, t);
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     @Test
     void testConstructorValido() {
@@ -104,5 +117,14 @@ class RecordatorioTest {
 
         assertTrue(r.esHoraDeTomar(),
                 "Debe activarse nuevamente cuando se cumple la frecuencia de horas");
+    }
+
+    @Test
+    void testFromCSV() {
+        Medicamento m = new Medicamento("Paracetamol", 500, 10, "01/01/2030");
+        Recordatorio r = Recordatorio.fromCSV("14:00;8;Paracetamol", List.of(m));
+
+        assertEquals(8, r.getFrecuenciaHoras());
+        assertEquals("Paracetamol", r.getMedicamentoAsociado().getNombre());
     }
 }
