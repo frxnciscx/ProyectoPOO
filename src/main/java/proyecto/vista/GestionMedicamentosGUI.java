@@ -8,6 +8,8 @@ import proyecto.modelo.Recordatorio;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.time.LocalTime;
@@ -165,8 +167,43 @@ public class GestionMedicamentosGUI extends JFrame {
         JComboBox<String> comboTipo = new JComboBox<>(new String[]{"Medicamento", "Insulina"});
         JLabel lblGlucosa = new JLabel("Glucosa minima (solo para Insulina):");
         JTextField txtGlucosa = new JTextField("70.0");
-        txtGlucosa.setEnabled(false);
 
+        //validaciones
+        txtDosis.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+                char c = e.getKeyChar();
+                if (!Character.isDigit(c) && c != KeyEvent.VK_BACK_SPACE) {
+                    e.consume();
+                }
+            }
+        });
+
+        txtCantidad.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+                char c = e.getKeyChar();
+                if (!Character.isDigit(c) && c != KeyEvent.VK_BACK_SPACE) {
+                    e.consume();
+                }
+            }
+        });
+
+        txtGlucosa.addKeyListener(new KeyAdapter() {
+            @Override
+            public void keyTyped(KeyEvent e) {
+                char c = e.getKeyChar();
+                if (!Character.isDigit(c) && c != KeyEvent.VK_BACK_SPACE && c != '.') {
+                    e.consume();
+                    return;
+                }
+                if (c == '.' && txtGlucosa.getText().contains(".")) {
+                    e.consume();
+                }
+            }
+        });
+
+        txtGlucosa.setEnabled(false);
         comboTipo.addActionListener(e -> txtGlucosa.setEnabled("Insulina".equals(comboTipo.getSelectedItem())));
 
         panelInput.add(new JLabel("Nombre:"));
