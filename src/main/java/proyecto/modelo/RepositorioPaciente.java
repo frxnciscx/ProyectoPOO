@@ -62,6 +62,9 @@ public class RepositorioPaciente {
                         return LocalDateTime.parse(json.getAsString(), DateTimeFormatter.ISO_LOCAL_DATE_TIME);
                     }
                 })
+
+                .registerTypeAdapter(Medicamento.class, new MedicamentoTypeAdapter())
+
                 .create();
 
         this.pacientes = new ArrayList<>();
