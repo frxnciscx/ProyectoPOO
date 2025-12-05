@@ -3,7 +3,7 @@ package proyecto.controlador;
 import proyecto.modelo.Paciente;
 import proyecto.modelo.Medicamento;
 import proyecto.modelo.Recordatorio;
-import proyecto.modelo.GestorDatosPaciente;
+import proyecto.modelo.datos.GestorDatosPaciente;
 import java.util.List;
 
 public class ControladorMedicamento {

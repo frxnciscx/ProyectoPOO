@@ -1,8 +1,13 @@
-package proyecto.modelo;
+package proyecto.modelo.datos;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
+import proyecto.modelo.Insulina;
+import proyecto.modelo.Medicamento;
+import proyecto.modelo.Paciente;
+import proyecto.modelo.Recordatorio;
+
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.StandardCopyOption;

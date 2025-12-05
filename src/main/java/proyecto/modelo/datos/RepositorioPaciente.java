@@ -1,7 +1,10 @@
-package proyecto.modelo;
+package proyecto.modelo.datos;
 
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
+import proyecto.modelo.Medicamento;
+import proyecto.modelo.Paciente;
+
 import java.io.*;
 import java.lang.reflect.Type;
 import java.nio.file.Files;

@@ -1,8 +1,8 @@
 package proyecto.controlador;
 
 import proyecto.modelo.Paciente;
-import proyecto.modelo.RepositorioPaciente;
-import proyecto.modelo.GestorDatosPaciente;
+import proyecto.modelo.datos.RepositorioPaciente;
+import proyecto.modelo.datos.GestorDatosPaciente;
 import java.util.Optional;
 
 public class ControladorPaciente {
