@@ -34,3 +34,4 @@ El proyecto sigue el patrón de arquitectura **Modelo-Vista-Controlador (MVC)** 
 ## Autores
 * Francisca Aguayo Benzan
 * Natalia Pérez González
+* Francisco Roa Araneda
