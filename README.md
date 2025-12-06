@@ -29,7 +29,7 @@ El proyecto sigue el patrón de arquitectura **Modelo-Vista-Controlador (MVC)** 
 * `proyecto.controlador`: Coordinadores de flujo y lógica de aplicación.
 
 ## Diagrama de Clases
-*(Adjuntar UML)*
+![ProyectoPOO.jpg](src/main/java/proyecto/ProyectoPOO.jpg)
 
 ## Autores
 * Francisca Aguayo Benzan
